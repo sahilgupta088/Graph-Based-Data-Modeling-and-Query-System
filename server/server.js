@@ -23,9 +23,24 @@ app.use('/api/graph', graphRoutes);
 app.use('/api/chat', chatRoutes);
 app.use('/api/ingest', ingestRoutes);
 
+// Serve static frontend in production
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Serve frontend build
+app.use(express.static(path.join(__dirname, '../client/dist')));
+
 // Health check
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
+// React / Vite SPA fallback
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../client/dist/index.html'));
 });
 
 // Start server
